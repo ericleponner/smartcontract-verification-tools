@@ -2,7 +2,13 @@ name: 'Verify Smart Contract'
 description: 'Verify metadata and sources of a smart contract'
 author: 'Hedera'
 inputs:
-  contractId: # change this
+  repo:
+    required: true
+    description: 'Path of verification repo'
+  network:
+    required: true
+    description: 'Hedera network (mainnet, testnet or previewnet)'
+  contract_id:
     required: true
     description: 'Identifier of Smart Contract (0.0.xxx)'
 runs:
