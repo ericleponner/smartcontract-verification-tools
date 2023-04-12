@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /*-
  *
  * Hedera Mirror Node Explorer
@@ -20,14 +21,18 @@
 
 import { expect, test } from "@jest/globals";
 import { Solc } from "../src/solc/Solc";
-import { SAMPLE_METADATA, SAMPLE_SOURCE } from "./sample";
+import { SAMPLE_METADATA, SAMPLE_SOURCE } from "./SampleContract";
+import { SAMPLE_INDEX } from "./SampleIndex";
+import { SolcUtils } from "../src/solc/SolcUtils";
 
 test("test runs", async () => {
 
-  const version = ""
+  const version = SolcUtils.extractSourceVersion(SAMPLE_SOURCE, SAMPLE_INDEX)
+  expect(version).toBe("0.8.19")
+
   const solcInput  = Solc.makeSolcInput(SAMPLE_SOURCE, "HelloWorld.sol")
   const importSources = {}
 
-  const solcOutput = await Solc.run(version, solcInput, importSources)
+  const solcOutput = await Solc.run(version!, solcInput, importSources)
   expect(solcOutput).toStrictEqual(SAMPLE_METADATA)
 })
