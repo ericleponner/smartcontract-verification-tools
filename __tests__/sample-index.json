@@ -1,10 +1,4 @@
-//
-// Content of https://binaries.soliditylang.org/bin/list.json on Apr 12, 2023.
-//
-
-import { SolcIndex } from "../src/solc/SolcIndex";
-
-export const SAMPLE_INDEX: SolcIndex = {
+{
   "builds": [
     {
       "path": "soljson-v0.1.1+commit.6ff4cd6.js",

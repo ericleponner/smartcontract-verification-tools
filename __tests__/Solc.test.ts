@@ -21,18 +21,26 @@
 
 import { expect, test } from "@jest/globals";
 import { Solc } from "../src/solc/Solc";
-import { SAMPLE_METADATA, SAMPLE_SOURCE } from "./SampleContract";
-import { SAMPLE_INDEX } from "./SampleIndex";
 import { SolcUtils } from "../src/solc/SolcUtils";
+import { SolcIndex } from "../src/solc/SolcIndex";
+import * as path from "path";
+import * as fs from "fs";
 
 test("test runs", async () => {
 
-  const version = SolcUtils.extractSourceVersion(SAMPLE_SOURCE, SAMPLE_INDEX)
+  const sampleContractPath = path.join(__dirname, "sample_repo", "testnet", "0.0.1234", "HelloWorld.sol")
+  const sampleContract = fs.readFileSync(sampleContractPath).toString()
+  const sampleMetadataPath = path.join(__dirname, "sample_repo", "testnet", "0.0.1234", "metadata.json")
+  const sampleMetadata = JSON.parse(fs.readFileSync(sampleMetadataPath).toString())
+  const sampleIndexPath = path.join(__dirname, "sample-index.json")
+  const sampleIndex: SolcIndex = JSON.parse(fs.readFileSync(sampleIndexPath).toString())
+
+  const version = SolcUtils.extractSourceVersion(sampleContract, sampleIndex)
   expect(version).toBe("0.8.19")
 
-  const solcInput  = Solc.makeSolcInput(SAMPLE_SOURCE, "HelloWorld.sol")
+  const input = Solc.makeSolcInput(sampleContract, "HelloWorld.sol")
   const importSources = {}
-
-  const solcOutput = await Solc.run(version!, solcInput, importSources)
-  expect(solcOutput).toStrictEqual(SAMPLE_METADATA)
+  const output = await Solc.run(version!, input, importSources)
+  expect(output).toStrictEqual(sampleMetadata)
 })
+

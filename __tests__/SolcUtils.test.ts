@@ -20,12 +20,17 @@
 
 import { expect, test } from "@jest/globals";
 import { SolcUtils } from "../src/solc/SolcUtils";
-import { SAMPLE_SOURCE } from "./SampleContract";
-import { SAMPLE_INDEX } from "./SampleIndex";
+import { SolcIndex } from "../src/solc/SolcIndex";
+import * as path from "path";
+import * as fs from "fs";
+
+const sampleContractPath = path.join(__dirname, "sample_repo", "testnet", "0.0.1234", "HelloWorld.sol")
+const sampleContract = fs.readFileSync(sampleContractPath).toString()
+const sampleIndexPath = path.join(__dirname, "sample-index.json")
+const sampleIndex: SolcIndex = JSON.parse(fs.readFileSync(sampleIndexPath).toString())
 
 test("extractSourceVersion()", () => {
 
-  const version = SolcUtils.extractSourceVersion(SAMPLE_SOURCE, SAMPLE_INDEX)
-  expect(version).toBe("0.8.19")
-
-})
+  const version = SolcUtils.extractSourceVersion(sampleContract, sampleIndex);
+  expect(version).toBe("0.8.19");
+});
