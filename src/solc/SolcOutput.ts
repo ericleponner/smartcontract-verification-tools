@@ -67,6 +67,7 @@ export interface ContractDescription {
     abi?: [],
     // EVM-related outputs
     evm?: EvmDescription
+    metadata?: string       // Serialized form of SolcMetadata
 }
 
 export interface EvmDescription {

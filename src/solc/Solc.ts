@@ -18,8 +18,9 @@
  *
  */
 
-import { SolcInput } from "./SolcInput"
-import { SolcOutput } from "./SolcOutput"
+import { SolcInput } from "./SolcInput";
+import { SolcOutput } from "./SolcOutput";
+import { SolcMetadata } from "./SolcMetadata";
 
 export class Solc {
 
@@ -58,6 +59,34 @@ export class Solc {
             },
         }
         result.sources[fileName] = { content: source }
+        return result
+    }
+
+    public static makeSolcInputFromMetadata(metadata: SolcMetadata): SolcInput {
+        const result: SolcInput = {
+            language: metadata.language,
+            sources: {},
+            settings: {
+                remappings: metadata.settings.remappings,
+                optimizer: metadata.settings.optimizer,
+                outputSelection: {
+                    '*': {
+                        '*': ['*'],
+                    },
+                }
+            }
+        }
+        for (const fileName of Object.keys(metadata.sources)) {
+            const sourceMetadata = metadata.sources[fileName]
+            result.sources[fileName] = {
+                keccak256: sourceMetadata.keccak256,
+            }
+            if (sourceMetadata.urls) {
+                result.sources[fileName].urls = [fileName]
+            } else if (sourceMetadata.content) {
+                result.sources[fileName].content = sourceMetadata.content
+            }
+        }
         return result
     }
 

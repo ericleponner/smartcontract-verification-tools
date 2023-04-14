@@ -22,6 +22,7 @@
 import {ContractDescription, SolcOutput} from "./SolcOutput";
 import {SolcIndex} from "./SolcIndex";
 import semver from "semver";
+import { SolcMetadata } from "./SolcMetadata";
 
 export class SolcUtils {
 
@@ -88,6 +89,17 @@ export class SolcUtils {
 
     public static fetchBytecode(sourceFileName: string, targetContract: string, output: SolcOutput): string|null {
         return SolcUtils.fetchDescription(sourceFileName, targetContract, output)?.evm?.deployedBytecode?.object ?? null
+    }
+
+    public static fetchMetadata(sourceFileName: string, targetContract: string, output: SolcOutput): SolcMetadata |null {
+        let result: SolcMetadata|null
+        const metadataText = SolcUtils.fetchDescription(sourceFileName, targetContract, output)?.metadata
+        try {
+            result = metadataText ? JSON.parse(metadataText) : null
+        } catch {
+            result = null
+        }
+        return result
     }
 
     public static extractSourceVersion(source: string, index: SolcIndex): string|null {
