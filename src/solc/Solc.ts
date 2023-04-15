@@ -26,9 +26,6 @@ export class Solc {
 
     public static async run(version: string, input: SolcInput, importSources: Record<string, string>): Promise<SolcOutput> {
 
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const solc = require("solc")
-
         const importCallback = (path: string) =>  {
             const result = {} as { contents?: string, error: unknown }
             if (path in importSources) {
@@ -38,7 +35,15 @@ export class Solc {
             }
             return result
         }
-        const options = { import: importCallback }
+        return Solc.runWithCallback(version, input, importCallback)
+    }
+
+    public static async runWithCallback(version: string, input: SolcInput, callback: SolcImportCallback): Promise<SolcOutput> {
+
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const solc = require("solc")
+
+        const options = { import: callback }
         const inputText = JSON.stringify(input)
 
         const result = JSON.parse(solc.compile(inputText, options)) as SolcOutput
@@ -114,3 +119,6 @@ export class Solc {
         return result
     }
 }
+
+export type SolcImportResult = { content?: string, error?: unknown }
+export type SolcImportCallback = (path: string) => SolcImportResult

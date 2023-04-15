@@ -20,13 +20,13 @@
  */
 
 import { expect, test } from "@jest/globals";
-import { Solc } from "../src/solc/Solc";
+import { Solc, SolcImportResult } from "../src/solc/Solc";
 import { SolcUtils } from "../src/solc/SolcUtils";
 import { SolcIndex } from "../src/solc/SolcIndex";
 import * as path from "path";
 import * as fs from "fs";
 
-test("test runs", async () => {
+test("Solc.run() + Solc.makeSolcInput()", async () => {
 
   const sampleContractPath = path.join(__dirname, "sample_repo", "testnet", "0.0.1234", "HelloWorld.sol")
   const sampleContract = fs.readFileSync(sampleContractPath).toString()
@@ -42,5 +42,35 @@ test("test runs", async () => {
   const importSources = {}
   const output = await Solc.run(version!, input, importSources)
   expect(output).toStrictEqual(sampleMetadata)
+})
+
+test("Solc.run() + Solc.makeSolcInputFromMetadata()", async () => {
+
+  const folderPath = path.join(__dirname, "sample_repo", "testnet", "0.0.1234")
+  const sampleMetadataPath = path.join(folderPath, "metadata.json")
+  const sampleMetadata = JSON.parse(fs.readFileSync(sampleMetadataPath).toString())
+
+  const solcMetadata = SolcUtils.fetchMetadata(
+    "HelloWorld.sol", "HelloWorld", sampleMetadata)
+  expect(solcMetadata).not.toBeNull()
+
+  const importCallback = (path: string): SolcImportResult =>  {
+    let result: SolcImportResult
+    try {
+      const content = fs.readFileSync(path).toString()
+      result = { content: content }
+    } catch(error) {
+      result = { error }
+    }
+    return result
+  }
+
+  const version = solcMetadata!.compiler.version
+  const input = Solc.makeSolcInputFromMetadata(solcMetadata!)
+  const output = await Solc.runWithCallback(version, input, importCallback)
+  if (output.errors) {
+    console.log(JSON.stringify(output.errors, null, "  "))
+  }
+  // expect(output).toStrictEqual(sampleMetadata)
 })
 
